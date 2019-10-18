@@ -1,0 +1,43 @@
+version: "2"
+
+services:
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hadoop-master
+    ports:
+      - "50070:50070"
+      - "8088:8088"
+      - "19888:19888"
+    volumes:
+      - ${PWD}/working:/home/bigdata/hadoop/working/
+    privileged: true
+    stdin_open: true
+    tty: true
+    mem_reservation: 4G
+    mem_limit: 8G
+
+#  slave:
+#    build:
+#     context: .
+#      dockerfile: Dockerfile
+#    container_name: hadoop-slave
+#    ports:
+#      - "50070"
+#      - "8088"
+#      - "19888"
+#    volumes:
+#      - ${PWD}/working:/home/bigdata/hadoop/working/
+#    privileged: true
+#    stdin_open: true
+#    tty: true
+#    mem_reservation: 4G
+#    mem_limit: 8G
+#    environment:
+#      - SERVICE_HOST_NAME=slave
+#    depends_on:
+#      - master
+
+
+# ssh-copy-id -i $HOME/.ssh/id_rsa.pub root@slave

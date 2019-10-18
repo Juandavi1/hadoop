@@ -1,0 +1,14 @@
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/home/bigdata/hadoop_store/hdfs/namenode</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/home/bigdata/hadoop_store/hdfs/datanode</value>
+    </property>
+</configuration>

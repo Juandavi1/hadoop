@@ -1,0 +1,3 @@
+REGISTER '/home/bigdata/hadoop/working/map-reduce/wc.jar';
+DEFINE MY_UDF com.myudfs.UPPER();
+SET default_parallel 10;
