@@ -11,12 +11,14 @@ services:
       - "8088:8088"
       - "19888:19888"
     volumes:
-      - ${PWD}/working:/home/bigdata/hadoop/working/
+      - ${PWD}/working:/home/bigdata/working/
     privileged: true
     stdin_open: true
     tty: true
     mem_reservation: 4G
     mem_limit: 8G
+    environment:
+      - WORK_DIR=/home/bigdata/working/
 
 #  slave:
 #    build:

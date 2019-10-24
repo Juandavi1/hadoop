@@ -1,0 +1,13 @@
+1967, The Piper at the Gates of Dawn,131,6
+1
+1969, Ummagumma,74,5
+1970, Atom Heart Mother,55,1
+1972, Obscured by Clouds, 46,6
+1973, The Dark Side of the Moon, 1,1
+1975, Wish you Were Here, 1,1
+1977, Animals, 3,2
+1979, The Wall, 1,3
+1983, The Final Cut, 6,1
+1987, A Momentary Lapse of Reason,3,3
+1994, The Division Bell, 1,1
+2014, The Endless River, 3, 1
