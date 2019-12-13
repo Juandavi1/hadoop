@@ -51,7 +51,7 @@
    ``` 
    O ESTOOO
    ```
-    ./sbin/hadoop-daemon.sh start datanode
+    cd $HADOOP_HOME && ./sbin/hadoop-daemon.sh start datanode
    ```
 
 ### Agregar mas contenido a un fechero ya existente
