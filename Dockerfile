@@ -2,20 +2,23 @@ FROM amd64/openjdk:7
 
 MAINTAINER JUAN
 
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update -y && \
           apt-get -y install sudo && \
           apt-get install curl -y && \
           apt-get install vim -y && \
           apt-get install wget -y && \
           apt-get install ssh -y && \
-          apt-get install rsync -y
+          apt-get install rsync -y && \
+          apt-get install mysql-server -y
 
 # SSH KEYS
 RUN mkdir ~/.ssh && ssh-keygen -q -t rsa -P '' -f ~/.ssh/id_rsa
 RUN cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 #END SSH
 
-# DOWNLOAD HADOOP, PIG, HIVE
+# DOWNLOAD HADOOP, PIG, HIVE, SQOOP
 RUN wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.2/hadoop-2.7.2.tar.gz
 RUN tar xfz hadoop-2.7.2.tar.gz
 RUN mkdir -p /home/bigdata/hadoop
@@ -30,6 +33,12 @@ RUN wget https://archive.apache.org/dist/hive/hive-2.1.0/apache-hive-2.1.0-bin.t
 RUN tar xfz apache-hive-2.1.0-bin.tar.gz
 RUN mkdir /home/bigdata/hive
 RUN mv apache-hive-2.1.0-bin/* /home/bigdata/hive/
+
+RUN wget http://apache.rediris.es/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+RUN tar xfz sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+RUN mkdir /home/bigdata/sqoop
+RUN mv sqoop-1.4.7.bin__hadoop-2.6.0/* /home/bigdata/sqoop/
+
 #END DOWNLOAD
 
 # CONFIG HADOOP
@@ -75,6 +84,17 @@ ENV PATH=$PATH:$HIVE_HOME/bin
 #schematool -initSchema -dbType derby
 #END CONFIG
 
+#Sqoop START
+ENV SQOOP_HOME=/home/bigdata/sqoop
+ENV PATH=$PATH:$SQOOP_HOME/bin
+COPY configs/sqoop-env.sh $SQOOP_HOME/conf/
+
+ENV HCAT_HOME=$HIVE_HOME/hcatalog/
+ENV PATH=$HCAT_HOME/bin:$PATH
+
+RUN wget http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar
+RUN mv mysql-connector-java-5.1.38.jar $SQOOP_HOME/lib/
+#Sqoop END
 
 COPY run.sh $HOME
 EXPOSE 50070 8088 19888

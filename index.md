@@ -230,3 +230,21 @@ Todos los comando de hdfs funcionan en grunt
      load data local inpath '/path/to/file.txt' into table nametable;
    
      
+##Sqoop
+
+### Importar datos de una db     
+    sqoop import --connect jdbc:mysql://mysql/sqoop --username root --password root --table users
+
+### Exportar
+    
+    sqoop export
+     --connect jdbc:mysql://mysql/sqoop
+     --table users \
+     --export-dir /results/users_data
+     
+     sqoop export 
+     --connect jdbc:mysql://mysql/sqoop 
+     --table users 
+     --username root 
+     --password root  
+     --export-dir /results/users_data

@@ -12,6 +12,7 @@ services:
       - "19888:19888"
     volumes:
       - ${PWD}/working:/home/bigdata/working/
+      - ${PWD}/hdfs-store:/home/bigdata/hadoop_store/hdfs/datanode
     privileged: true
     stdin_open: true
     tty: true
@@ -19,6 +20,29 @@ services:
     mem_limit: 8G
     environment:
       - WORK_DIR=/home/bigdata/working/
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ${PWD}/configs/migration:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+
 
 #  slave:
 #    build:
