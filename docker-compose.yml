@@ -10,9 +10,11 @@ services:
       - "50070:50070"
       - "8088:8088"
       - "19888:19888"
+      - "4040:4040"
     volumes:
       - ${PWD}/working:/home/bigdata/working/
       - ${PWD}/hdfs-store:/home/bigdata/hadoop_store/hdfs/datanode
+      - ${PWD}/.m2:/root/.m2/
     privileged: true
     stdin_open: true
     tty: true

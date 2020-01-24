@@ -68,7 +68,10 @@
 ### Traer dicheros desde hdfs a la maquina
      hdfs dfs -get /file.txt file.txt
 
-### Copiar ficheros en directorios
+### Copiar ficheros del servidor local a hdfs
+     hdfs dfs -put file.txt /directory/
+     
+### Copiar ficheros en directorios dentro de hdfs
      hdfs dfs -cp /file.txt /directory
 
 ### Mostrar el tamaño de ficheros y directorios 
@@ -248,3 +251,91 @@ Todos los comando de hdfs funcionan en grunt
      --username root 
      --password root  
      --export-dir /results/users_data
+
+
+## Spark 
+
+### RDD
+    Resilient distributed dataset.
+    
+    spark-shell -> Scala
+    pyspark     -> Python
+    
+    Todo sobre un rdd es lazy hasta que se ejecuta una accion.
+    Existen dos conceptos para trababajar con RDD's: 
+    Transformaciones: 
+        map
+        flatMap
+        filter
+        sortBy
+        ...
+    Acciones: 
+        count
+        reduce
+        foreach
+        collect
+        take
+        reduceByKey
+        first
+        ... 
+
+#### Scala    
+##### Leer fichero en hdfs a partir de spark context (sc)
+    // scala
+    val lines = sc.textFile("hdfs://localhost:9000/spark/file.txt")
+    // python
+    textFile = sc.textFile("/spark/file.txt")
+    
+##### Aplicar transformaciones y acciones
+    lines 
+        map(_.trim)
+        filter(_.length>0)
+        map(_.split(" "))
+        map(_.length)
+        filter(_>1)
+        foreach(print _) // accion
+    
+    textFile
+        .map(lambda x: x*2)
+        .filter(lambda x: x%2==0)
+        .count()
+    
+
+##### Crear un RDD a partir de un array 
+    val rdd = sc.parallelize(Array(1,2,3,4,5,6)).map(_*2)
+    list = sc.parallelize([1,2,3,4,5,6]).map(lambda x: x*2).filter(lambda x: x%2==0).collect()
+    
+
+## Spark SQL 
+
+##### Crear una tabla y realizar consultas sobre ella 
+    import org.apache.spark.sql.Row;
+    import org.apache.spark.sql.types.{StructType,StructField,StringType};
+    
+    val sqlContext = spark.sqlContext
+    val people = sc.textFile("hdfs://localhost:9000/people.txt")
+    
+    val schemaString = "nombre edad"
+    val schema = StructType(schemaString.split(" ").map(fieldName => StructField(fieldName, StringType, true)))
+    
+    val rowRDD = people.map(_.split(",")).map(p => Row(p(0), p(1).trim))
+    val peopledf = sqlContext.createDataFrame(rowRDD, schema)
+    peopledf.createOrReplaceTempView("people")
+    
+    peopledf.show()
+    sqlContext.sql("SELECT nombre, edad FROM people").show()
+    
+    peopledf.printSchema()
+    
+    peopledf.select("nombre").show()
+    sqlContext.sql("select nombre from people").show()
+    
+    peopledf.select($"nombre", $"edad" * 2).show()
+    sqlContext.sql("select nombre,(edad * 2) from people").show()
+    
+    peopledf.filter($"edad" > 22).show()
+    sqlContext.sql("select * from people where edad > 22").show()
+    
+    peopledf.groupBy("edad").count().show()
+    sqlContext.sql("select edad,count(edad) from people group by edad order by edad desc").show()
+    

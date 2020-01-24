@@ -1,8 +1,6 @@
-FROM amd64/openjdk:7
+FROM amd64/openjdk:8
 
 MAINTAINER JUAN
-
-ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -y && \
           apt-get -y install sudo && \
@@ -11,7 +9,20 @@ RUN apt-get update -y && \
           apt-get install wget -y && \
           apt-get install ssh -y && \
           apt-get install rsync -y && \
-          apt-get install mysql-server -y
+          apt-get install mysql-server -y && \
+          apt install maven -y && apt-get install zsh -y && \
+          apt-get install git-core -y
+
+## ZSH
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+RUN chsh -s `which zsh` && zsh
+#RUN git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.zsh/zsh-autosuggestions
+#RUN echo "/bin/bash -c 'source $HOME/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh'" >> $HOME/.zshrc && ls -la $HOME
+#RUN /bin/bash -c "source $HOME/.zshrc"
+## END ZSH
+
+
+ENV DEBIAN_FRONTEND noninteractive
 
 # SSH KEYS
 RUN mkdir ~/.ssh && ssh-keygen -q -t rsa -P '' -f ~/.ssh/id_rsa
@@ -39,10 +50,14 @@ RUN tar xfz sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 RUN mkdir /home/bigdata/sqoop
 RUN mv sqoop-1.4.7.bin__hadoop-2.6.0/* /home/bigdata/sqoop/
 
+RUN wget https://www-us.apache.org/dist/spark/spark-3.0.0-preview2/spark-3.0.0-preview2-bin-hadoop2.7.tgz
+RUN tar -xvf spark-3.0.0-preview2-bin-hadoop2.7.tgz
+RUN mkdir /home/bigdata/spark
+RUN mv spark-3.0.0-preview2-bin-hadoop2.7/* /home/bigdata/spark/
 #END DOWNLOAD
 
 # CONFIG HADOOP
-ENV JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV HADOOP_HOME=/home/bigdata/hadoop/hadoop-2.7.2
 ENV PATH=$PATH:$HADOOP_HOME/bin
 ENV PATH=$PATH:$HADOOP_HOME/sbin
@@ -54,7 +69,7 @@ ENV HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
 ENV HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
 
 COPY configs/core-site.xml $HADOOP_HOME/etc/hadoop/
-RUN echo "export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 RUN echo "export HADOOP_SSH_OPTS='-p 22' " >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 RUN  mkdir -p /home/bigdata/hadoop_store/hdfs/namenode
@@ -92,9 +107,18 @@ COPY configs/sqoop-env.sh $SQOOP_HOME/conf/
 ENV HCAT_HOME=$HIVE_HOME/hcatalog/
 ENV PATH=$HCAT_HOME/bin:$PATH
 
-RUN wget http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar
-RUN mv mysql-connector-java-5.1.38.jar $SQOOP_HOME/lib/
+#REVISAR ESTÓ !!!
+#RUN wget http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar
+#RUN mv mysql-connector-java-5.1.38.jar $SQOOP_HOME/lib/
+
 #Sqoop END
+
+#SPARK CONFIG
+ENV SPARK_HOME=/home/bigdata/spark
+ENV PATH=$PATH:$SPARK_HOME/bin
+COPY configs/spark-env.sh $SPARK_HOME/conf/
+###
+
 
 COPY run.sh $HOME
 EXPOSE 50070 8088 19888

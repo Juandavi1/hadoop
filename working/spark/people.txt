@@ -1,0 +1,4 @@
+juan,23
+vale,21
+luz,50
+lau,22
