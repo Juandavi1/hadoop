@@ -11,7 +11,7 @@ RUN apt-get update -y && \
           apt-get install rsync -y && \
           apt-get install mysql-server -y && \
           apt install maven -y && apt-get install zsh -y && \
-          apt-get install git-core -y
+          apt-get install git-core -y && sudo apt install netcat -y
 
 ## ZSH
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh

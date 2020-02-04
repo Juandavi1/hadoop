@@ -254,7 +254,8 @@ Todos los comando de hdfs funcionan en grunt
 
 
 ## Spark 
-
+    https://blog.usejournal.com/spark-study-notes-core-concepts-visualized-5256c44e4090
+    
 ### RDD
     Resilient distributed dataset.
     
@@ -339,3 +340,14 @@ Todos los comando de hdfs funcionan en grunt
     peopledf.groupBy("edad").count().show()
     sqlContext.sql("select edad,count(edad) from people group by edad order by edad desc").show()
     
+## Spark Streaming
+#### iniciar el demonio master y slave 
+    ./sbin/start-master.sh && ./sbin/start-slave.sh
+    
+#### ejecutar ejemplos incluidos en spark con spark-submit  
+    nc -lvp 9999 &&   
+    $SPARK_HOME/bin/spark-submit \
+     --class org.apache.spark.examples.streaming.NetworkWordCount \
+     --master "local[2]" \
+     ./examples/jars/spark-examples_2.12-3.0.0-preview2.jar \
+     localhost 9999
