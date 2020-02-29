@@ -1,6 +1,6 @@
 FROM amd64/openjdk:8
 
-MAINTAINER JUAN
+MAINTAINER CHOJUAN
 
 RUN apt-get update -y && \
           apt-get -y install sudo && \
@@ -9,7 +9,7 @@ RUN apt-get update -y && \
           apt-get install wget -y && \
           apt-get install ssh -y && \
           apt-get install rsync -y && \
-          apt-get install mysql-server -y && \
+          #apt-get install mysql-server -y && \
           apt install maven -y && apt-get install zsh -y && \
           apt-get install git-core -y && sudo apt install netcat -y
 
@@ -57,7 +57,7 @@ RUN mv spark-3.0.0-preview2-bin-hadoop2.7/* /home/bigdata/spark/
 #END DOWNLOAD
 
 # CONFIG HADOOP
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV HADOOP_HOME=/home/bigdata/hadoop/hadoop-2.7.2
 ENV PATH=$PATH:$HADOOP_HOME/bin
 ENV PATH=$PATH:$HADOOP_HOME/sbin
@@ -69,7 +69,7 @@ ENV HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
 ENV HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
 
 COPY configs/core-site.xml $HADOOP_HOME/etc/hadoop/
-RUN echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+RUN echo "export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 RUN echo "export HADOOP_SSH_OPTS='-p 22' " >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
 RUN  mkdir -p /home/bigdata/hadoop_store/hdfs/namenode

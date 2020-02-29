@@ -1,7 +1,7 @@
-#Tue Feb 04 01:32:12 UTC 2020
-storageID=DS-2b11343e-b851-44ae-b373-72b32b80b76d
-clusterID=CID-895df481-ccd0-4c49-a8e4-950c038bbf7c
-cTime=0
-datanodeUuid=2a3cf7cc-d643-4880-8fd8-7f4d6c9df112
+#Mon Feb 24 05:09:46 UTC 2020
+datanodeUuid=38860ce1-eab2-40b1-894c-d4e8b275744e
 storageType=DATA_NODE
+cTime=0
+clusterID=CID-daa81965-b0b5-49be-be1d-f0c78750387f
 layoutVersion=-56
+storageID=DS-4c7613b8-7aa5-4bfd-bf45-c1178ae673e8

@@ -1,0 +1,9 @@
+#id_pelicula, id_actor, role
+1,4,actor
+1,5,actor
+1,7,actor
+2,5,actor
+2,6,actor
+2,7,actor
+3,5,actor
+3,7,director

@@ -351,3 +351,25 @@ Todos los comando de hdfs funcionan en grunt
      --master "local[2]" \
      ./examples/jars/spark-examples_2.12-3.0.0-preview2.jar \
      localhost 9999
+     
+## FLUME
+    La arquitectura de flume se divide en: 
+    
+    source(fuente) 
+        consumen eventos de cualquier sistema 
+        externo y lo reenvian a los canales (channels)
+    
+    Interceptors
+        permiten hacer modificaciones sobre los eventos recibidos
+       
+    Selectors
+        permite definir rutas para los eventos 
+        
+    Channels
+        almacenan los eventos hasta que son consumidos por un sink
+        Sistema de almacenamiento temporal.
+        
+    Sink
+        Obtienen eventos de un canal. por ejemplo HDFS 
+    
+    

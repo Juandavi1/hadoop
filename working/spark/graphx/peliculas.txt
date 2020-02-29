@@ -1,0 +1,4 @@
+#id_pelicula, titulo, anio
+1,Pulp fiction,1994
+2,Django desencadenado,2012
+3,Los odiosos ocho,2015
