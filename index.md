@@ -372,4 +372,207 @@ Todos los comando de hdfs funcionan en grunt
     Sink
         Obtienen eventos de un canal. por ejemplo HDFS 
     
+#### Source 
+    
+    Flume incorpora varias fuentes ya implementadas:
+    
+        ○ Avro: Escucha eventos en un puerto enviados via Avro RPC
+        ○ Thrift: Escucha eventos en un puerto enviados via Thrift RPC
+        ○ Exec: Ejecuta un comando Unix y convierte la salida stdout en eventos
+        ○ JMS: Lee mensajes de una cola ó tópico JMS y los convierte en
+            eventos
+        ○ Spooling Directory: Lee los ficheros que se escriben en una ruta y
+            convierte las líneas en eventos
+        ○ Twitter: Integración con Streaming API de Twitter
+        ○ NetCat: Escucha en un puerto y convierte cada línea de texto en un
+            evento
+        ○ Sequence Generator: Generador de eventos para pruebas
+        ○ Syslog: Convierte eventos syslog en eventos Flume
+        ○ HTTP: Escucha en un puerto y convierte peticiones HTTP en eventos
+    
+Se deben tener en cuenta dos factores importantes al momento de 
+configurar un Source: 
+        
+    ○ Batch Size(registros o tiempo): numero maximo de eventos recibidos en el source por transaccion.
+                  Tiene mucha importancia a nivel de rendimiento. 
+                  Recomendación: empezar con batch size = 1000 y luego ajustar.
+    
+    ○ Threads: Cada fuente utiliza un modelo distinto de “Threading”.
+               Es importante conocer cómo maneja los Threads la fuente que
+               estamos intentando optimizar.
+               Por ejemplo:
+                    ○ Avro Source es un servidor Netty, capaz de manejar varios
+                      hilos de por sí. Para añadir paralelismo símplemente
+                      necesitamos más “Avro Clients” enviando datos.
+                    ○ JMS Source es una fuente de tipo “pull”, con un único hilo
+                      consumiendo de una cola de mensajes. Para añadir
+                      paralelismo necesitamos añadir más fuentes JMS a Flume
+                      consumiendo de la misma cola 
+
+#### Sinks 
+    
+    Son los encargados de persistir los datos en su destino final
+    
+    Algunos de los que vienen ya implementados en Flume:
+        ○ HDFS: Escribe eventos en HDFS en formato Text,
+            SequenceFile, Avro ó un formato propio
+        ○ Logger: Escribe eventos en un log con nivel INFO usando
+            SLF4J
+        ○ Avro: Envía eventos via Avro RPC a un Avro Source
+        ○ Thrift: Envía eventos via Thrift RPC a un Thrifs Source
+        ○ IRC: Envía eventos a un canal IRC
+        ○ File Roll: Escribe eventos en el file-system local
+        ○ Hbase: Escribe eventos en HBase
+        ○ Solr: Indexa documentos en Solr
+        ○ ElasticSearch: Indexa documentos en Elasticsearch con el
+            formato de Logstash
+    
+Se deben tener en cuenta dos factores importantes al momento de configurar un Sink:
+    
+    ○ Número de Sinks
+    ○ Tamaño de Batch
+    
+    ● Un sink sólo puede consumir eventos de un channel
+    ● Muchos sinks pueden consumir eventos de un mismo channel
+    ● Un sink es siempre un único hilo
+    ● Para poder paralelizar, aumentamos el número de sinks
+        consumiendo del mismo channel
+    ● Por ejemplo: un solo sink escribiendo en HDFS sólo podrá
+    alcanzar como máximo el rendimiento de escritura de un solo
+    disco. Si aumentamos el número de sinks, aumentaremos la
+    cantidad de datos que podemos escribir por unidad de tiempo.
+    ● En este caso la limitación será la red ó la CPU, pero no HDFS
+    ● Siempre que hablamos de operaciones con discos, trabajar con
+    batches incrementa el rendimiento
+    ● Un sink de flume debe garantizar al channel que los datos han sido
+    persistidos en destino, lo que implica que se debe invocar la
+    operación de systema fsync (que es costosa)
+    ● Si estamos usando batches de poco tamaño, se perderá mucho
+    tiempo invocando estas llamadas de sistema
+    ● El único problema de batches más grandes es el mayor riesgo de
+    eventos duplicados en caso de fallos.
+    ● Tendremos que llegar a un compromiso entre rendimiento y riesgo
+    de duplicar eventos.
+    
+    
+#### Channels 
+Sistema de almacenamiento temporal que conecta al source con el sink. 
+    
+    ● Son los repositorios donde los eventos son temporalmente almacenados en un agente.
+    ● Las fuentes añaden eventos y los “sinks” los eliminan
+    ● Los más utilizados son:
+        ○ Memory Channel: Almacena eventos en una cola en
+            memoria de eventos
+        ○ File Channel: Almacena eventos en un log transaccional en
+            un fichero local
+        ○ JDBC Channel: Almacena eventos en una base de datos
+            (Derby)
+    
+Memory Channel
+    
+    ● Se utiliza cuando la prioridad es el rendimiento y la pérdida de
+        datos es asumible
+    ● Si la máquina que aloja el memory channel cae, o se
+        interrumpe el proceso Java que lo aloja, todos los eventos de
+        ese channel se perderán (ya que estaban en memoria)
+    ● El número de eventos que se pueden almacenar está limitado
+        por la cantidad de memoria RAM, por lo que si hay fallos en
+        siguientes agentes, no podrá almacenar muchos eventos antes
+        de empezar a perder datos.
+    
+File Channel
+    
+    ● Persiste los eventos en disco, por lo que es más confiable que
+        el canal en memoria y menos eficiente
+    ● También escribe periódicamente “checkpoints”, que facilitan el
+        reinicio y recuperación de los File Channels
+    ● Se puede configurar para utilizar varios discos y obtener así
+        mayor rendimiento
+    
+#### Patrones comunes 
+    
+    ● Fan-in (Agregación)
+        ○ El patrón de recolección más común o Un agente Flume en
+            cada sistema origen (p. ej. Servidores web), que envían
+            eventos a agentes Flume en nodos cliente del cluster Hadoop
+            (que están en la misma red que el cluster).
+        ○ Utilizar múltiples nodos clientes de HDFS aporta robustez a la
+            arquitectura: si uno de ellos deja de dar servicio, no se
+            perderán eventos
+        ○ Normalmente se envían los eventos comprimidos para
+            reducir el tráfico de red
+        ○ Flume soporta tráfico encriptado SSL entre los agentes
+   
+   ![pattern flume fan in ](images/flume/fan_in.png)
+   
+       ● Esta estructura de capas de agentes Flume es la forma estándar de
+            escalar una arquitectura de recolección
+       ● La segunda capa de agentes, agrega eventos de varias fuentes, y los
+            persiste en un único fichero HDFS
+       ● Esto permite tener menos ficheros más grandes en HDFS
+       ● Normalmente con 2 capas de agentes Flume podremos conseguir la
+            escalabilidad deseada, pero se podrían definir más si el número de
+            orígenes es muy grande.
+       ● Para construir este tipo de topologías se utilizan sinks y sources de
+            tipo Avro ó Thrift. En ambos casos la comunicación entre agentes es
+            via RPC (Esto no significa necesariamente que el formato de fichero
+            en HDFS será AVRO)
+       ● Mediante Transacciones, Flume garantiza que un batch de eventos se
+            entrega correctamente desde un source a un channel y desde un
+            channel a un sink.
+       ● En una topología de varias capas de agentes, Flume garantiza que
+            cada batch de eventos de un agente de la primera capa, es
+            correctamente entregado a un agente de la segunda capa
+
+   ![pattern flume fan in ](images/flume/fan_in_multiple_agents.png)
+    
+    ● Podemos definir “sink groups” en los agentes de la primera capa,
+        para aportar más robustez a la topología y balancear la carga
+    ● Si uno de los agentes del segundo nivel cae, los eventos serán
+        entregados a otro agente de ese nivel y evitaremos pérdida de datos
+    
+   ![pattern flume fan in ](images/flume/sink_groups.png)
+    
+#### Fan Out (dividir los datos en la recolección)
+
+    ○ Enviar eventos a más de un destino
+    ○ Muy utilizado cuando se tiene un segundo cluster Hadoop
+        para “Disaster Recovery”
+    ○ Un cluster hadoop de “Disaster Recovery” es un cluster
+        secundario pensado para dar servicio si el cluster primario
+        cae.
+    ○ También sirve para hacer backup de los datos del cluster
+        primario (forma habitual de hacer backup en Hadoop)
+    
+   ![pattern flume fan in ](images/flume/fan_out.png)
+        
+    ● Particionar los datos en el destino
+        ○ Flume se puede utilizar para particionar los datos según
+            los va persistiendo en destino
+        ○ Ejemplo: El HDFS sink puede particionar datos por
+            fecha, etc
+            
+   ![pattern flume fan in ](images/flume/partition.png)
+       
+    ● “Stream Analytics”
+        ○ A veces no se utiliza una capa de persistencia como destino
+            de los datos de Flume
+        ○ Otro caso común es enviarlo a un motor de procesamiento
+            en streaming como Storm o Spark Streaming
+        ○ Por ejemplo, la integración con Spark Streaming es sencilla
+            por que éste implementa la interfaz de Fuente Avro de
+            Flume, por lo que lo único que haremos es apuntar un
+            sumidero Flume de Avro a Spark Streaming
+        ○ En este caso probablemente querremos utilizar Memory
+            Channels
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
