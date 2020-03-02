@@ -54,6 +54,11 @@ RUN wget https://www-us.apache.org/dist/spark/spark-3.0.0-preview2/spark-3.0.0-p
 RUN tar -xvf spark-3.0.0-preview2-bin-hadoop2.7.tgz
 RUN mkdir /home/bigdata/spark
 RUN mv spark-3.0.0-preview2-bin-hadoop2.7/* /home/bigdata/spark/
+
+RUN wget https://downloads.apache.org/flume/1.9.0/apache-flume-1.9.0-bin.tar.gz
+RUN tar -xvf apache-flume-1.9.0-bin.tar.gz
+RUN mkdir /home/bigdata/flume
+RUN mv apache-flume-1.9.0-bin/* /home/bigdata/flume/
 #END DOWNLOAD
 
 # CONFIG HADOOP
@@ -117,6 +122,11 @@ ENV PATH=$HCAT_HOME/bin:$PATH
 ENV SPARK_HOME=/home/bigdata/spark
 ENV PATH=$PATH:$SPARK_HOME/bin
 COPY configs/spark-env.sh $SPARK_HOME/conf/
+###
+
+#FLUME CONFIG
+ENV FLUME_HOME=/home/bigdata/flume
+ENV PATH=$PATH:$FLUME_HOME/bin
 ###
 
 

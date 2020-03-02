@@ -2,7 +2,7 @@
 
 rm -r /home/bigdata/hadoop_store/hdfs/datanode/current
 /etc/init.d/ssh restart
-cd $HADOOP_HOME
+cd "$HADOOP_HOME" || exit
 hadoop namenode -format
 ./sbin/start-dfs.sh
 ./sbin/start-yarn.sh

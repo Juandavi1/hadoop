@@ -13,5 +13,6 @@
     hdfs dfs -ls /
     pig --version
     hive --version
+    flume-ng version
     spark-shell
     pyspark
