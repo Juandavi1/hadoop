@@ -50,10 +50,10 @@ RUN tar xfz sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 RUN mkdir /home/bigdata/sqoop
 RUN mv sqoop-1.4.7.bin__hadoop-2.6.0/* /home/bigdata/sqoop/
 
-RUN wget https://www-us.apache.org/dist/spark/spark-3.0.0-preview2/spark-3.0.0-preview2-bin-hadoop2.7.tgz
-RUN tar -xvf spark-3.0.0-preview2-bin-hadoop2.7.tgz
+RUN wget https://www-us.apache.org/dist/spark/spark-3.0.1/spark-3.0.1-bin-hadoop2.7.tgz
+RUN tar -xvf spark-3.0.1-bin-hadoop2.7.tgz
 RUN mkdir /home/bigdata/spark
-RUN mv spark-3.0.0-preview2-bin-hadoop2.7/* /home/bigdata/spark/
+RUN mv spark-3.0.1-bin-hadoop2.7/* /home/bigdata/spark/
 
 RUN wget https://downloads.apache.org/flume/1.9.0/apache-flume-1.9.0-bin.tar.gz
 RUN tar -xvf apache-flume-1.9.0-bin.tar.gz

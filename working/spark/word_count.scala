@@ -1,8 +1,12 @@
 import scala.util.{Try, Success, Failure}
 
-val lines = sc.textFile("hdfs://localhost:9000/file.txt")
-lines.count()
-val lineLengths = lines.map(_.split(" ")).map(r=>Try(r(0)) getOrElse("notFound")).cache()
-lineLengths.collect().foreach(println)
+val lines = sc.textFile("hdfs://localhost:9000/spark")
+lines.count() // accion
 
-// val totalLength = lineLengths.reduce ((a, b) => a + b)
+val lineLengths = lines
+  .map(_.split(" ")) // transformacion
+  .map(r=>Try(r(0))
+    getOrElse("notFound")).cache()
+
+val total =  lineLengths.collect().toList
+println(total)
