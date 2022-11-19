@@ -566,13 +566,10 @@ File Channel
         ○ En este caso probablemente querremos utilizar Memory
             Channels
     
-    
-    
-    
-    
-    
-    
-    
-    
+## FLINK
+  iniciar cluster de flink
+  
+    start-cluster.sh
+
     
     

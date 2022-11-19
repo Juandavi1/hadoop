@@ -1,4 +1,4 @@
-version: "2"
+version: "3.4"
 
 services:
   master:
@@ -11,6 +11,7 @@ services:
       - "8088:8088"
       - "19888:19888"
       - "4040:4040"
+      - "8081:8081"
     volumes:
       - ${PWD}/working:/home/bigdata/working/
       - ${PWD}/hdfs-store:/home/bigdata/hadoop_store/hdfs/datanode
@@ -38,8 +39,9 @@ services:
       - mysql
     image: phpmyadmin/phpmyadmin
     restart: always
-    ports:
-      - 8081:80
+      #    ports:
+      # commented port conflict with flink
+      # - 8081:80 
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306

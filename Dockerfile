@@ -35,7 +35,7 @@ RUN tar xfz hadoop-2.7.2.tar.gz
 RUN mkdir -p /home/bigdata/hadoop
 RUN mv hadoop-2.7.2 /home/bigdata/hadoop
 
-RUN wget http://apache.claz.org/pig/pig-0.16.0/pig-0.16.0.tar.gz
+RUN wget https://dlcdn.apache.org/pig/pig-0.16.0/pig-0.16.0.tar.gz
 RUN tar xfz pig-0.16.0.tar.gz
 RUN mkdir /home/bigdata/pig
 RUN mv pig-0.16.0 /home/bigdata/pig
@@ -45,21 +45,32 @@ RUN tar xfz apache-hive-2.1.0-bin.tar.gz
 RUN mkdir /home/bigdata/hive
 RUN mv apache-hive-2.1.0-bin/* /home/bigdata/hive/
 
-RUN wget http://apache.rediris.es/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
+RUN wget https://archive.apache.org/dist/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 RUN tar xfz sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz
 RUN mkdir /home/bigdata/sqoop
 RUN mv sqoop-1.4.7.bin__hadoop-2.6.0/* /home/bigdata/sqoop/
 
-RUN wget https://www-us.apache.org/dist/spark/spark-3.0.1/spark-3.0.1-bin-hadoop2.7.tgz
-RUN tar -xvf spark-3.0.1-bin-hadoop2.7.tgz
+RUN wget https://dlcdn.apache.org/spark/spark-3.3.1/spark-3.3.1-bin-hadoop2.tgz
+RUN tar -xvf spark-3.3.1-bin-hadoop2.tgz
 RUN mkdir /home/bigdata/spark
-RUN mv spark-3.0.1-bin-hadoop2.7/* /home/bigdata/spark/
+RUN mv spark-3.3.1-bin-hadoop2/* /home/bigdata/spark/
 
-RUN wget https://downloads.apache.org/flume/1.9.0/apache-flume-1.9.0-bin.tar.gz
-RUN tar -xvf apache-flume-1.9.0-bin.tar.gz
+RUN wget https://dlcdn.apache.org/flume/1.11.0/apache-flume-1.11.0-bin.tar.gz
+RUN tar -xvf apache-flume-1.11.0-bin.tar.gz
 RUN mkdir /home/bigdata/flume
-RUN mv apache-flume-1.9.0-bin/* /home/bigdata/flume/
+RUN mv apache-flume-1.11.0-bin/* /home/bigdata/flume/
+
+RUN wget https://dlcdn.apache.org/flink/flink-1.16.0/flink-1.16.0-bin-scala_2.12.tgz
+RUN tar -xvf flink-1.16.0-bin-scala_2.12.tgz
+RUN mkdir /home/bigdata/flink
+RUN mv flink-1.16.0/* /home/bigdata/flink/
 #END DOWNLOAD
+
+# CONFIG FLINK
+ENV FLINK_HOME=/home/bigdata/flink
+ENV PATH=$PATH:$FLINK_HOME/bin
+COPY configs/flink-conf.yaml $FLINK_HOME/conf/
+# END FLINK CONFIG
 
 # CONFIG HADOOP
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
