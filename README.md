@@ -20,4 +20,4 @@
 
 ### Notes 
 
-[this file](infex.md) includes a small detail about each tool and comments to play with them. 
+[this file](index.md) includes a small detail about each tool and comments to play with them. 
